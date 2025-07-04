@@ -4,17 +4,32 @@ on:
   workflow_dispatch:      # Allows manual triggering from GitHub UI
 
 jobs:
-  call-api:
+  run-pipeline:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Call FastAPI endpoint with headers and body
+      - name: Get yesterday's date
+        id: get-date
+        run: echo "yesterday=$(date -d 'yesterday' +%F)" >> "$GITHUB_OUTPUT"
+
+      - name: Call FastAPI pipeline endpoint
         run: |
-          curl -X POST ${{ secrets.API_URL }} \
+          curl -X POST "${{ secrets.API_URL }}/pipeline/run" \
             -H "Content-Type: application/json" \
             -H "X-API-KEY: ${{ secrets.API_KEY }}" \
-            -d '{
-              "param1": "value1",
-              "param2": "value2",
-              "param3": "value3"
-            }'
+            -d "{
+              \"target_date\": \"${{ steps.get-date.outputs.yesterday }}\",
+              \"dev_mode\": false,
+              \"embed_model\": \"Qwen/Qwen3-Embedding-8B\",
+              \"enabled_steps\": [
+                # \"fetch_articles\",
+                # \"process_articles\",
+                # \"generate_umap\",
+                # \"initial_cluster\",
+                # \"fill_cluster\",
+                # \"update_cluster_assignments\",
+                # \"assemble_newsletter\",
+                # \"format_html\",
+                \"send_newsletter\"
+              ]
+            }"
