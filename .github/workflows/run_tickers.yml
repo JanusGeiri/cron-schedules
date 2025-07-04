@@ -1,20 +1,22 @@
-name: Run newsletter backend tickers via API
+name: Run newsletter backend ticker fetching via API
 
 on:
   workflow_dispatch:      # Allows manual triggering from GitHub UI
 
 jobs:
-  call-api:
+  run-pipeline:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Call FastAPI endpoint with headers and body
+      - name: Get yesterday's date
+        id: get-date
+        run: echo "yesterday=$(date -d 'yesterday' +%F)" >> "$GITHUB_OUTPUT"
+
+      - name: Call FastAPI pipeline endpoint
         run: |
-          curl -X POST ${{ secrets.API_URL }} \
+          curl -X GET "${{ secrets.API_URL }}/tickers/by-date/" \
             -H "Content-Type: application/json" \
             -H "X-API-KEY: ${{ secrets.API_KEY }}" \
-            -d '{
-              "param1": "value1",
-              "param2": "value2",
-              "param3": "value3"
-            }'
+            -d "{
+              \"target_date\": \"${{ steps.get-date.outputs.yesterday }}\"
+            }"
