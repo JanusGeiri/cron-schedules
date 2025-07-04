@@ -14,9 +14,6 @@ jobs:
 
       - name: Call FastAPI pipeline endpoint
         run: |
-          curl -X GET "${{ secrets.API_URL }}/tickers/by-date/" \
+          curl -X GET "${{ secrets.API_URL }}/tickers/by-date/${{ steps.get-date.outputs.yesterday }}" \
             -H "Content-Type: application/json" \
-            -H "X-API-KEY: ${{ secrets.API_KEY }}" \
-            -d "{
-              \"target_date\": \"${{ steps.get-date.outputs.yesterday }}\"
-            }"
+            -H "X-API-KEY: ${{ secrets.API_KEY }}"
