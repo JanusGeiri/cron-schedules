@@ -2,6 +2,8 @@ name: Run newsletter backend pipeline via API
 
 on:
   workflow_dispatch:      # Allows manual triggering from GitHub UI
+  schedule:
+    - cron: "40 0 * * *"
 
 jobs:
   run-pipeline:
@@ -23,7 +25,7 @@ jobs:
             | jq \
               --arg td "${{ steps.get-date.outputs.yesterday }}" \
               --arg em "Qwen/Qwen3-Embedding-8B" \
-              --argjson steps '["assemble_newsletter","format_html","send_newsletter"]' \
+              --argjson steps '["fetch_articles","process_articles","generate_umap","initial_cluster","fill_cluster","update_cluster_assignments","assemble_newsletter","format_html","send_newsletter"]' \
               --argjson rand "${{ steps.get-random.outputs.rand }}" \
               '. 
                 | .target_date = $td 
