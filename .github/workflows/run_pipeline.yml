@@ -16,26 +16,26 @@ jobs:
         id: get-random
         run: echo "rand=$(( RANDOM ))" >> "$GITHUB_OUTPUT"
 
-      - name: Call FastAPI pipeline endpoint
+      - name: Build JSON payload with jq
+        id: payload
+        run: |
+          echo '{}' \
+            | jq \
+              --arg td "${{ steps.get-date.outputs.yesterday }}" \
+              --arg em "Qwen/Qwen3-Embedding-8B" \
+              --argjson steps '["send_newsletter"]' \
+              --argjson rand "${{ steps.get-random.outputs.rand }}" \
+              '. 
+                | .target_date = $td 
+                | .dev_mode = false 
+                | .embed_model = $em 
+                | .enabled_steps = $steps 
+                | .clustering_umap_random_state = $rand
+              ' > payload.json
+
+      - name: Send pipeline request
         run: |
           curl -X POST "${{ secrets.API_URL }}/pipeline/run" \
             -H "Content-Type: application/json" \
             -H "X-API-KEY: ${{ secrets.API_KEY }}" \
-            -d @- <<EOF
-{
-  "target_date": "${{ steps.get-date.outputs.yesterday }}",
-  "dev_mode": false,
-  "embed_model": "Qwen/Qwen3-Embedding-8B",
-  "enabled_steps": [
-    # "fetch_articles",
-    # "process_articles",
-    # "generate_umap",
-    # "initial_cluster",
-    # "fill_cluster",
-    # "update_cluster_assignments",
-    # "assemble_newsletter",
-    # "format_html",
-    "send_newsletter"
-  ]
-}
-EOF
+            -d @payload.json
