@@ -2,6 +2,8 @@ name: Run newsletter backend ticker fetching via API
 
 on:
   workflow_dispatch:      # Allows manual triggering from GitHub UI
+  schedule:
+    - cron: "30 0 * * *"
 
 jobs:
   run-pipeline:
@@ -14,6 +16,6 @@ jobs:
 
       - name: Call FastAPI pipeline endpoint
         run: |
-          curl -X GET "${{ secrets.API_URL }}/tickers/by-date/${{ steps.get-date.outputs.yesterday }}" \
+          curl -X POST "${{ secrets.API_URL }}/tickers/fetch/${{ steps.get-date.outputs.yesterday }}" \
             -H "Content-Type: application/json" \
             -H "X-API-KEY: ${{ secrets.API_KEY }}"
