@@ -12,6 +12,10 @@ jobs:
         id: get-date
         run: echo "yesterday=$(date -d 'yesterday' +%F)" >> "$GITHUB_OUTPUT"
 
+      - name: Generate random state
+        id: get-random
+        run: echo "rand=$(( RANDOM ))" >> "$GITHUB_OUTPUT"
+
       - name: Call FastAPI pipeline endpoint
         run: |
           curl -X POST "${{ secrets.API_URL }}/pipeline/run" \
@@ -31,5 +35,21 @@ jobs:
                 # \"assemble_newsletter\",
                 # \"format_html\",
                 \"send_newsletter\"
-              ]
+              ],
+              \"clustering_min_cluster_size\": 2,
+              \"clustering_min_samples\": 2,
+              \"clustering_metric\": \"euclidean\",
+              \"clustering_selection_epsilon\": 0.0075,
+              \"clustering_selection_method\": \"leaf\",
+              \"clustering_allow_single_cluster\": true,
+              \"clustering_umap_n_neighbors\": 12,
+              \"clustering_umap_n_components\": 40,
+              \"clustering_umap_metric\": \"cosine\",
+              \"clustering_umap_min_dist\": 0.05,
+              \"clustering_umap_spread\": 1.5,
+              \"clustering_umap_init\": \"spectral\",
+              \"clustering_umap_learning_rate\": 0.6,
+              \"clustering_umap_n_epochs\": 10000,
+              \"clustering_umap_low_memory\": false,
+              \"clustering_umap_random_state\": ${{ steps.get-random.outputs.rand }}
             }"
