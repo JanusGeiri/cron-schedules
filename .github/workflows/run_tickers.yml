@@ -1,0 +1,20 @@
+name: Run newsletter backend tickers via API
+
+on:
+  workflow_dispatch:      # Allows manual triggering from GitHub UI
+
+jobs:
+  call-api:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Call FastAPI endpoint with headers and body
+        run: |
+          curl -X POST ${{ secrets.API_URL }} \
+            -H "Content-Type: application/json" \
+            -H "X-API-KEY: ${{ secrets.API_KEY }}" \
+            -d '{
+              "param1": "value1",
+              "param2": "value2",
+              "param3": "value3"
+            }'
