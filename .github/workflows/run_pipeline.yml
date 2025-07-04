@@ -23,7 +23,7 @@ jobs:
             | jq \
               --arg td "${{ steps.get-date.outputs.yesterday }}" \
               --arg em "Qwen/Qwen3-Embedding-8B" \
-              --argjson steps '["send_newsletter"]' \
+              --argjson steps '["assemble_newsletter","format_html","send_newsletter"]' \
               --argjson rand "${{ steps.get-random.outputs.rand }}" \
               '. 
                 | .target_date = $td 
