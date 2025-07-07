@@ -2,8 +2,6 @@ name: Test newsletter backend ticker fetching via API
 
 on:
   workflow_dispatch:      # Allows manual triggering from GitHub UI
-  schedule:
-    - cron: "30 0 * * *"
 
 jobs:
   run-pipeline:
